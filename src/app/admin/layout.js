@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -394,7 +394,9 @@ export default function AdminLayout({ children }) {
                collapsed ? "w-[68px]" : "w-60",
             )}
          >
-            <SidebarContent collapsed={collapsed} />
+            <Suspense fallback={null}>
+               <SidebarContent collapsed={collapsed} />
+            </Suspense>
          </aside>
 
          {mobileOpen && (
@@ -413,10 +415,12 @@ export default function AdminLayout({ children }) {
                         <X size={18} />
                      </button>
                   </div>
-                  <SidebarContent
-                     collapsed={false}
-                     onNavigate={() => setMobileOpen(false)}
-                  />
+                  <Suspense fallback={null}>
+                     <SidebarContent
+                        collapsed={false}
+                        onNavigate={() => setMobileOpen(false)}
+                     />
+                  </Suspense>
                </div>
             </div>
          )}

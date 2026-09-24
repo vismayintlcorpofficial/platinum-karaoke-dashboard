@@ -220,7 +220,6 @@ function Dashboard({ goSong, goArtist, presetSearch }) {
                           return (
                              <button
                                 key={r.id}
-                                onClick={() => goSong(r.songNumber)}
                                 className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-neutral-50"
                              >
                                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-primary)]/10 text-black">
@@ -252,7 +251,6 @@ export default function DashboardPage() {
    const router = useRouter();
    return (
       <Dashboard
-         goSong={songNumber => router.push(`/admin/songs?number=${songNumber}`)}
          goArtist={artist =>
             router.push(`/admin/artists?artist=${encodeURIComponent(artist)}`)
          }
