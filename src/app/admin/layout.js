@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -378,10 +378,6 @@ function Header({ collapsed, setCollapsed, setMobileOpen }) {
 export default function AdminLayout({ children }) {
    const [collapsed, setCollapsed] = useState(false);
    const [mobileOpen, setMobileOpen] = useState(false);
-
-   useEffect(() => {
-      setMobileOpen(false);
-   }, []);
 
    return (
       <div

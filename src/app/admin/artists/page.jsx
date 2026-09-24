@@ -149,7 +149,7 @@ function ArtistDetail({ artist, onBack, goSong }) {
 
          <Card className="p-4">
             <h3 className="mb-3 text-sm font-semibold text-neutral-900">
-               {artist}'s Most Played Songs
+               {artist}&apos;s Most Played Songs
             </h3>
             {loading ? (
                <div className="space-y-2">

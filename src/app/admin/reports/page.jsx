@@ -51,11 +51,11 @@ function WeeklyReport({ goSong }) {
    const weekAnchor = addDays(NOW, weekOffset * 7);
    const { start, end, series, records } = useMemo(
       () => getWeekSeries(weekAnchor),
-      [weekOffset],
+      [weekAnchor],
    );
    const prevWeek = useMemo(
       () => getWeekSeries(addDays(weekAnchor, -7)),
-      [weekOffset],
+      [weekAnchor],
    );
 
    const total = getTotalPlays(records);
@@ -587,7 +587,7 @@ function ArtistReportPage({ goArtist }) {
                change: prev === 0 ? null : pctChange(a.plays, prev),
             };
          }),
-      [records, prevTotals],
+      [records, prevTotals, weekAgo, monthAgo],
    );
 
    return (
