@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
    Mic2,
    ChevronLeft,
@@ -17,7 +17,6 @@ import {
    LayoutDashboard,
    Music,
    Users,
-   BarChart3,
    Settings,
 } from "lucide-react";
 
@@ -27,17 +26,10 @@ const NAV_PRIMARY = [
    { href: "/admin/artists", label: "Artists", icon: Users },
 ];
 
-const NAV_REPORTS = [
-   { href: "/admin/reports?report=weekly", label: "Weekly Report" },
-   { href: "/admin/reports?report=monthly", label: "Monthly Report" },
-   { href: "/admin/reports?report=artist", label: "Artist Report" },
-];
-
 const PAGE_META = {
    "/admin": "Dashboard",
    "/admin/songs": "Songs",
    "/admin/artists": "Artists",
-   "/admin/reports": "Reports",
    "/admin/settings": "Settings",
 };
 
@@ -91,18 +83,6 @@ function NavItem({
 
 function SidebarContent({ collapsed, onNavigate }) {
    const pathname = usePathname();
-   const [reportsOpen, setReportsOpen] = useState(
-      pathname === "/admin/reports",
-   );
-   const searchParams = useSearchParams();
-
-   const activeReport = searchParams.get("report");
-
-   const isReportActive = href => {
-      const report = new URLSearchParams(href.split("?")[1]).get("report");
-
-      return pathname === "/admin/reports" && activeReport === report;
-   };
 
    return (
       <div className="flex h-full flex-col">
@@ -117,7 +97,7 @@ function SidebarContent({ collapsed, onNavigate }) {
             </div>
             {!collapsed && (
                <span className="text-[15px] font-semibold tracking-tight text-neutral-900">
-                  Karaoke Admin
+                  Platinum Karaoke
                </span>
             )}
          </div>
@@ -138,53 +118,6 @@ function SidebarContent({ collapsed, onNavigate }) {
                   onClick={onNavigate}
                />
             ))}
-
-            <div className="pt-0.5">
-               <button
-                  type="button"
-                  onClick={() => (collapsed ? null : setReportsOpen(v => !v))}
-                  className={cn(
-                     "group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                     pathname === "/admin/reports"
-                        ? "bg-[var(--brand-primary)]/10 font-medium text-black"
-                        : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
-                  )}
-               >
-                  <BarChart3
-                     size={17}
-                     className={
-                        pathname === "/admin/reports"
-                           ? "text-[var(--brand-primary)]"
-                           : "text-neutral-400"
-                     }
-                  />
-                  {!collapsed && <span className="truncate">Reports</span>}
-                  {!collapsed && (
-                     <ChevronDown
-                        size={14}
-                        className={cn(
-                           "ml-auto transition-transform",
-                           reportsOpen && "rotate-180",
-                        )}
-                     />
-                  )}
-               </button>
-               {!collapsed && reportsOpen && (
-                  <div className="mt-0.5 space-y-0.5">
-                     {NAV_REPORTS.map(r => (
-                        <NavItem
-                           key={r.href}
-                           href={r.href}
-                           label={r.label}
-                           nested
-                           collapsed={false}
-                           active={isReportActive(r.href)}
-                           onClick={onNavigate}
-                        />
-                     ))}
-                  </div>
-               )}
-            </div>
 
             <NavItem
                href="/admin/settings"
@@ -217,7 +150,7 @@ function SidebarContent({ collapsed, onNavigate }) {
                         Admin
                      </p>
                      <p className="truncate text-[11px] text-neutral-400">
-                        The Note Bar
+                        Platinum Karaoke
                      </p>
                   </div>
                )}
@@ -308,7 +241,7 @@ function Header({ collapsed, setCollapsed, setMobileOpen }) {
                               s: "2 min ago",
                            },
                            {
-                              t: "Monthly report for August is ready",
+                              t: "Playback data synced successfully",
                               s: "3 hours ago",
                            },
                            {

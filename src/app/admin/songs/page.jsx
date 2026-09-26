@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -27,6 +27,10 @@ import {
 } from "../_shared";
 
 function SongsPage({ goSong, initialQuery }) {
+   const [range, setRange] = useState({
+      preset: "This Month",
+      ...resolvePreset("This Month"),
+   });
    const loading = useSimulatedLoad([]);
    const rows = useMemo(() => {
       const weekAgo = addDays(NOW, -7),
@@ -39,14 +43,15 @@ function SongsPage({ goSong, initialQuery }) {
             songNumber: s.songNumber,
             title: s.title,
             artist: s.artist,
-            totalPlays: st.totalPlays,
+            totalPlays: filterByRange(st.records, range.start, range.end)
+               .length,
             thisWeek: st.records.filter(r => r.playedAt >= weekAgo).length,
             thisMonth: st.records.filter(r => r.playedAt >= monthAgo).length,
             lastPlayed: last ? fmtDateFull(last) : "Never",
             _last: last ? last.getTime() : 0,
          };
       });
-   }, []);
+   }, [range]);
 
    return (
       <div className="space-y-5">
@@ -59,6 +64,15 @@ function SongsPage({ goSong, initialQuery }) {
             </p>
          </div>
          <Card className="p-4">
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+               <p className="text-sm text-neutral-500">
+                  Showing play counts for{" "}
+                  <span className="font-medium text-neutral-700">
+                     {range.preset}
+                  </span>
+               </p>
+               <DateRangeFilter value={range} onChange={setRange} />
+            </div>
             {loading ? (
                <div className="space-y-2">
                   {Array.from({ length: 8 }).map((_, i) => (
@@ -68,6 +82,7 @@ function SongsPage({ goSong, initialQuery }) {
             ) : (
                <DataTable
                   pageSize={10}
+                  showPageSizeControl
                   searchKeys={["songNumber", "title", "artist"]}
                   searchPlaceholder="Search by number, title or artist…"
                   onRowClick={row => goSong(row.songNumber)}
@@ -80,22 +95,10 @@ function SongsPage({ goSong, initialQuery }) {
                      { key: "artist", label: "Artist", sortable: true },
                      {
                         key: "totalPlays",
-                        label: "Total Plays",
+                        label: `Total Plays (${range.preset})`,
                         sortable: true,
                         align: "right",
                         render: r => r.totalPlays.toLocaleString(),
-                     },
-                     {
-                        key: "thisWeek",
-                        label: "This Week",
-                        sortable: true,
-                        align: "right",
-                     },
-                     {
-                        key: "thisMonth",
-                        label: "This Month",
-                        sortable: true,
-                        align: "right",
                      },
                      {
                         key: "lastPlayed",
@@ -176,16 +179,6 @@ function SongDetail({ songNumber, onBack, goArtist }) {
             <StatCard
                label="Total Plays"
                value={stats.totalPlays.toLocaleString()}
-               loading={loading}
-            />
-            <StatCard
-               label="This Week"
-               value={stats.thisWeek.toLocaleString()}
-               loading={loading}
-            />
-            <StatCard
-               label="This Month"
-               value={stats.thisMonth.toLocaleString()}
                loading={loading}
             />
             <StatCard

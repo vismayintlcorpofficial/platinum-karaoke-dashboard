@@ -2,10 +2,14 @@
 
 export const dynamic = "force-dynamic";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getArtistStats, getTopSongs } from "@/lib/admin/analytics";
+import {
+   filterByRange,
+   getArtistStats,
+   getTopSongs,
+} from "@/lib/admin/analytics";
 import { NOW, ARTIST_NAMES } from "@/lib/admin/data";
 import { addDays } from "@/lib/admin/dates";
 import {
@@ -13,12 +17,18 @@ import {
    Skeleton,
    EmptyState,
    ErrorState,
+   DateRangeFilter,
    DataTable,
    StatCard,
    useSimulatedLoad,
+   resolvePreset,
 } from "../_shared";
 
 function ArtistsPage({ goArtist }) {
+   const [range, setRange] = useState({
+      preset: "This Month",
+      ...resolvePreset("This Month"),
+   });
    const loading = useSimulatedLoad([]);
    const rows = useMemo(() => {
       const weekAgo = addDays(NOW, -7),
@@ -29,12 +39,13 @@ function ArtistsPage({ goArtist }) {
             id: artist,
             artist,
             songs: st.totalSongs,
-            totalPlays: st.totalPlays,
+            totalPlays: filterByRange(st.records, range.start, range.end)
+               .length,
             thisWeek: st.records.filter(r => r.playedAt >= weekAgo).length,
             thisMonth: st.records.filter(r => r.playedAt >= monthAgo).length,
          };
       });
-   }, []);
+   }, [range]);
 
    return (
       <div className="space-y-5">
@@ -45,6 +56,15 @@ function ArtistsPage({ goArtist }) {
             </p>
          </div>
          <Card className="p-4">
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+               <p className="text-sm text-neutral-500">
+                  Showing play counts for{" "}
+                  <span className="font-medium text-neutral-700">
+                     {range.preset}
+                  </span>
+               </p>
+               <DateRangeFilter value={range} onChange={setRange} />
+            </div>
             {loading ? (
                <div className="space-y-2">
                   {Array.from({ length: 8 }).map((_, i) => (
@@ -54,6 +74,7 @@ function ArtistsPage({ goArtist }) {
             ) : (
                <DataTable
                   pageSize={10}
+                  showPageSizeControl
                   searchKeys={["artist"]}
                   searchPlaceholder="Search artists…"
                   onRowClick={row => goArtist(row.artist)}
@@ -69,7 +90,7 @@ function ArtistsPage({ goArtist }) {
                      },
                      {
                         key: "totalPlays",
-                        label: "Total Plays",
+                        label: `Total Plays (${range.preset})`,
                         sortable: true,
                         align: "right",
                         render: r => r.totalPlays.toLocaleString(),

@@ -169,7 +169,7 @@ function Dashboard({ goSong, goArtist, presetSearch }) {
                </h3>
                {loading ? (
                   <div className="space-y-2">
-                     {Array.from({ length: 5 }).map((_, i) => (
+                     {Array.from({ length: 8 }).map((_, i) => (
                         <Skeleton key={i} className="h-9 w-full" />
                      ))}
                   </div>
@@ -180,7 +180,7 @@ function Dashboard({ goSong, goArtist, presetSearch }) {
                   />
                ) : (
                   <DataTable
-                     pageSize={5}
+                     pageSize={8}
                      searchKeys={["title", "artist", "songNumber"]}
                      searchPlaceholder="Search song, artist or #…"
                      onRowClick={row => goSong(row.songNumber)}

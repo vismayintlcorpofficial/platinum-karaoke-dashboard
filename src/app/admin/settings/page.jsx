@@ -42,7 +42,6 @@ export default function SettingsPage() {
                   <option>Sunday</option>
                </select>
             </div>
-
             <div className="flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2.5">
                <div>
                   <p className="text-sm font-medium text-neutral-700">
@@ -73,9 +72,19 @@ export default function SettingsPage() {
 
             <button
                type="button"
-               className="rounded-lg bg-[var(--brand-primary)] px-4 py-2 text-sm font-medium text-black hover:bg-[#d19f1f]"
+               className="
+    relative overflow-hidden rounded-lg
+    bg-(--brand-primary) px-4 py-2
+    text-sm font-medium text-black
+    transition-colors duration-700
+    before:absolute before:inset-y-0 before:inset-x-0 before:left-0 before:top-0 before:w-0
+    before:bg-black
+    before:transition-all before:duration-700 before:ease-in-out
+    hover:before:w-full
+    hover:text-(--brand-primary)
+  "
             >
-               Save changes
+               <span className="relative">Save changes</span>
             </button>
          </Card>
       </div>

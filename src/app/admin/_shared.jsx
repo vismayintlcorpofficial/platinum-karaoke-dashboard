@@ -128,6 +128,7 @@ const PRESETS = [
    "Last Week",
    "This Month",
    "Last Month",
+   "This Quarter",
    "This Year",
    "Custom Range",
 ];
@@ -152,6 +153,15 @@ function resolvePreset(preset, customStart, customEnd) {
          const lm = addMonths(NOW, -1);
          return { start: startOfMonth(lm), end: endOfMonth(lm) };
       }
+      case "This Quarter":
+         return {
+            start: new Date(
+               NOW.getFullYear(),
+               Math.floor(NOW.getMonth() / 3) * 3,
+               1,
+            ),
+            end: endOfDay(NOW),
+         };
       case "This Year":
          return { start: startOfYear(NOW), end: endOfDay(NOW) };
       case "Custom Range":
@@ -407,10 +417,13 @@ function DataTable({
    initialSort,
    defaultQuery = "",
    emptyMessage = "No results found.",
+   showPageSizeControl = false,
+   pageSizeOptions = [8, 12, 15, 20],
 }) {
    const [query, setQuery] = useState(defaultQuery);
    const [sort, setSort] = useState(initialSort || null);
    const [page, setPage] = useState(1);
+   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
 
    const filtered = useMemo(() => {
       if (!query || !searchKeys) return data;
@@ -438,11 +451,11 @@ function DataTable({
       });
    }, [filtered, sort]);
 
-   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+   const totalPages = Math.max(1, Math.ceil(sorted.length / rowsPerPage));
    const clampedPage = Math.min(page, totalPages);
    const pageData = sorted.slice(
-      (clampedPage - 1) * pageSize,
-      clampedPage * pageSize,
+      (clampedPage - 1) * rowsPerPage,
+      clampedPage * rowsPerPage,
    );
 
    function toggleSort(key) {
@@ -547,40 +560,65 @@ function DataTable({
                   </table>
                </div>
 
-               {totalPages > 1 && (
+               {(totalPages > 1 || showPageSizeControl) && (
                   <div className="mt-3 flex items-center justify-between text-sm text-neutral-500">
-                     <span>
-                        Page {clampedPage} of {totalPages}
-                     </span>
-                     <div className="flex items-center gap-1">
-                        <button
-                           disabled={clampedPage === 1}
-                           onClick={() => setPage(1)}
-                           className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
-                        >
-                           <ChevronsLeft size={15} />
-                        </button>
-                        <button
-                           disabled={clampedPage === 1}
-                           onClick={() => setPage(p => p - 1)}
-                           className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
-                        >
-                           <ChevronLeft size={15} />
-                        </button>
-                        <button
-                           disabled={clampedPage === totalPages}
-                           onClick={() => setPage(p => p + 1)}
-                           className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
-                        >
-                           <ChevronRight size={15} />
-                        </button>
-                        <button
-                           disabled={clampedPage === totalPages}
-                           onClick={() => setPage(totalPages)}
-                           className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
-                        >
-                           <ChevronsRight size={15} />
-                        </button>
+                     <div className="flex items-center gap-4">
+                        {showPageSizeControl && (
+                           <label className="flex items-center gap-2">
+                              <span>Show rows</span>
+                              <select
+                                 value={rowsPerPage}
+                                 onChange={event => {
+                                    setRowsPerPage(Number(event.target.value));
+                                    setPage(1);
+                                 }}
+                                 className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm text-neutral-700"
+                              >
+                                 {pageSizeOptions.map(size => (
+                                    <option key={size} value={size}>
+                                       {size}
+                                    </option>
+                                 ))}
+                              </select>
+                           </label>
+                        )}
+                        {totalPages > 1 && (
+                           <>
+                              <span>
+                                 Page {clampedPage} of {totalPages}
+                              </span>
+                              <div className="flex items-center gap-1">
+                                 <button
+                                    disabled={clampedPage === 1}
+                                    onClick={() => setPage(1)}
+                                    className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
+                                 >
+                                    <ChevronsLeft size={15} />
+                                 </button>
+                                 <button
+                                    disabled={clampedPage === 1}
+                                    onClick={() => setPage(p => p - 1)}
+                                    className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
+                                 >
+                                    <ChevronLeft size={15} />
+                                 </button>
+                                 <button
+                                    disabled={clampedPage === totalPages}
+                                    onClick={() => setPage(p => p + 1)}
+                                    className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
+                                 >
+                                    <ChevronRight size={15} />
+                                 </button>
+                                 <button
+                                    disabled={clampedPage === totalPages}
+                                    onClick={() => setPage(totalPages)}
+                                    className="rounded-md p-1.5 hover:bg-neutral-100 disabled:opacity-30"
+                                 >
+                                    <ChevronsRight size={15} />
+                                 </button>
+                              </div>
+                           </>
+                        )}
                      </div>
                   </div>
                )}
