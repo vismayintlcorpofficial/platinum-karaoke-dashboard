@@ -162,17 +162,23 @@ function getSongStats(songNumber) {
     records: all,
   };
 }
+
 function getArtistStats(artist) {
   const songs = SONGS.filter(s => s.artist === artist);
   const numbers = new Set(songs.map(s => s.songNumber));
   const all = PLAYBACK.filter(r => numbers.has(r.songNumber));
+  const today = new Date(NOW);
+  today.setHours(0, 0, 0, 0);
   const weekAgo = addDays(NOW, -7);
   const monthAgo = addDays(NOW, -30);
+  const yearAgo = addDays(NOW, -365);
   return {
     totalSongs: songs.length,
     totalPlays: all.length,
+    thisDay: all.filter(r => r.playedAt >= today).length,
     thisWeek: all.filter(r => r.playedAt >= weekAgo).length,
     thisMonth: all.filter(r => r.playedAt >= monthAgo).length,
+    thisYear: all.filter(r => r.playedAt >= yearAgo).length,
     records: all,
     songs,
   };
@@ -189,7 +195,6 @@ function getUserStats(userId) {
     totalPlays: all.length,
     uniqueSongs: new Set(all.map(r => r.songNumber)).size,
     thisDay: all.filter(r => r.playedAt >= today).length,
-
     thisWeek: all.filter(r => r.playedAt >= weekAgo).length,
     thisMonth: all.filter(r => r.playedAt >= monthAgo).length,
     thisYear: all.filter(r => r.playedAt >= yearAgo).length,

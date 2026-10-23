@@ -132,8 +132,8 @@ function UserDetail({ userId, onBack }) {
         <ArrowLeft size={15} /> Back to Users
       </button>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Card className="p-5 lg:col-span-2">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <Card className="p-5 col-span-2 lg:col-span-1">
           <h2 className="text-xl font-semibold text-neutral-900">
             {user.name}
           </h2>
